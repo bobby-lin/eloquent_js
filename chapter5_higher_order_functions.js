@@ -34,6 +34,56 @@ function every_using_some(array, predicate) {
     return !array.some(element => !predicate(element));
 }
 
-console.log(every([1, 3, 5], n => n < 10));
-console.log(every([2, 4, 16], n => n < 10));
-console.log(every([], n => n < 10));
+//console.log(every([1, 3, 5], n => n < 10));
+//console.log(every([2, 4, 16], n => n < 10));
+//console.log(every([], n => n < 10));
+
+//Dominant Writing Direction
+const SCRIPTS = require('./utils/script');
+
+function characterScript(code) {
+    for (let script of SCRIPTS) {
+      if (script.ranges.some(([from, to]) => {
+        return code >= from && code < to;
+      })) {
+        return script;
+      }
+    }
+    return null;
+}
+
+function countBy(items, groupName) {
+    let counts = [];
+    for (let item of items) {
+        let name = groupName(item);
+        let known = counts.findIndex(c => c.name == name);
+        if (known == -1) {
+            counts.push({name, count: 1});
+        } 
+        else {
+            counts[known].count++;
+        }
+    }
+    return counts;
+}
+
+//console.log(countBy([1, 2, 3, 4, 5], n => n > 2));
+
+function dominantDirection(text) {
+    let counted_items = countBy(text, n => {
+        let script = characterScript(n.codePointAt(0));
+        if(script != null) {
+            return script;
+        }
+        return "none";
+    }).filter(element => element.name != "none");
+
+    return counted_items.reduce((a, b) => a.count > b.count ? a : b).name.direction;
+}
+
+console.log(dominantDirection("Hello!"));
+// → ltr
+
+console.log(dominantDirection("Hey, مساء الخير"));
+ // → rtl
+
