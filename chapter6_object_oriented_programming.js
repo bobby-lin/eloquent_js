@@ -34,6 +34,10 @@ class Group {
         return grp;
     }
 
+    [Symbol.iterator]() {
+        return new GroupIterator(this);
+    }
+
     add(val) {
         if (this.group.indexOf(val) === -1) {
             this.group.push(val);
@@ -67,3 +71,29 @@ group.add(10);
 group.delete(10);
 console.log(group.has(10));
 // → false
+
+class GroupIterator {
+    constructor(group) {
+        this.group = group;
+        this.position = 0;
+    }
+
+    next() {
+        if(this.position >= this.group.group.length) {
+            return {done: true};
+        }
+        else {
+            let result = {value: this.group.group[this.position], done: false};
+            this.position++;
+            return result;
+        }
+    }
+
+}
+
+for (let value of Group.from(["a1", "b", "c", "112"])) {
+    console.log(value);
+  }
+  // → a
+  // → b
+  // → c
